@@ -1,0 +1,73 @@
+---
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck and test
+        run: |
+          npm run typecheck
+          npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Check dist is up to date
+        run: git diff --exit-code dist/
+
+  integration:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install latest
+        id: latest
+        uses: ./
+
+      - name: Run installed gobottle
+        run: gobottle version
+
+      - name: Install exact pin
+        id: pinned
+        uses: ./
+        with:
+          version: 0.2.0
+
+      - name: Install prefix
+        id: prefix
+        uses: ./
+        with:
+          version: "0"
+
+      - name: Assert resolutions
+        run: |
+          test "${{ steps.pinned.outputs.version }}" = "0.2.0"
+          test -n "${{ steps.prefix.outputs.version }}"
+          test "${{ steps.pinned.outputs.cache-hit }}" = "true"
