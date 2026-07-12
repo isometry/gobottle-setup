@@ -30,6 +30,29 @@ jobs:
           GOBOTTLE_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
 ```
 
+### Reusing goreleaser's build
+
+If the same job already ran goreleaser, don't spend runner minutes
+recompiling: bottle the archives goreleaser left in `dist/` (tar.gz, zip,
+or tar.bz2; requires gobottle ≥0.5). Bottles then contain binaries
+byte-identical to your GitHub-release archives — one build, one
+provenance chain:
+
+```yaml
+      - uses: goreleaser/goreleaser-action@v7
+        with:
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: isometry/gobottle-setup@v1
+
+      - run: gobottle release --source local
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOBOTTLE_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+```
+
 ## Inputs
 
 | Input        | Default             | Description                                                    |
