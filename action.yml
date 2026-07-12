@@ -1,0 +1,40 @@
+---
+name: Setup gobottle
+description: >-
+  Install gobottle from verified GitHub release binaries (checksums + SLSA
+  build provenance), with full semver pinning.
+author: isometry
+branding:
+  icon: package
+  color: orange
+
+inputs:
+  version:
+    description: >-
+      Version to install: 'latest', an exact pin (1.2.3 or v1.2.3;
+      prereleases only when pinned exactly), or a prefix (1, 1.2) resolved
+      to the newest matching stable release.
+    default: latest
+  repository:
+    description: Repository to install gobottle from.
+    default: isometry/gobottle
+  token:
+    description: GitHub token for API access, asset download, and attestation verification.
+    default: ${{ github.token }}
+  verify:
+    description: >-
+      Verify SLSA build provenance with `gh attestation verify` before
+      installing. Checksums are always enforced regardless.
+    default: "true"
+
+outputs:
+  version:
+    description: The resolved version that was installed (without 'v' prefix).
+  path:
+    description: Directory containing the gobottle binary.
+  cache-hit:
+    description: Whether the binary came from the runner tool cache.
+
+runs:
+  using: node24
+  main: dist/index.js

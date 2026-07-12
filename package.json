@@ -1,0 +1,28 @@
+{
+  "name": "gobottle-setup",
+  "version": "0.0.0",
+  "private": true,
+  "description": "GitHub Action to install gobottle from verified release binaries",
+  "license": "MIT",
+  "author": "Robin Breathe",
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --platform=node --target=node24 --format=cjs --outfile=dist/index.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "all": "npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "@actions/core": "^3.0.1",
+    "@actions/exec": "^3.0.0",
+    "@actions/io": "^3.0.2",
+    "@actions/tool-cache": "^4.0.0",
+    "semver": "^7.8.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/semver": "^7.7.1",
+    "esbuild": "^0.28.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  }
+}
